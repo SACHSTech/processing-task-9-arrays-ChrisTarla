@@ -14,8 +14,8 @@ public class Sketch extends PApplet {
   boolean blnLeft = false;
   boolean blnDown = false;
   boolean blnRight = false;
-  int intPlayerX = 200;
-  int intPlayerY = 375;
+  int intPlayerX = 300;
+  int intPlayerY = 575;
   // Snow Variables 
   int intSnowX;
   float[] fltSnowY = new float[15];
@@ -28,14 +28,14 @@ public class Sketch extends PApplet {
   // Called once at the beginning of execution, put your size all in this method
   public void settings() {
 	// put your size call here
-    size(400, 400);
+    size(600, 600);
   }
 
   // Called once at the beginning of execution.  Add initial set up values here i.e background, stroke, fill etc. 
   public void setup() {
     background(205, 230, 255);
     for (int i = 0; i < fltSnowY.length; i++){
-      fltSnowY[i] = random(height);
+      fltSnowY[i] = random(0, 450);
     }
   }
 
@@ -45,6 +45,19 @@ public class Sketch extends PApplet {
       // Reset background for animation effect 
       background(205, 230, 255);
       
+      // Player Lives 
+      stroke(255,70, 70);
+      fill(255, 70, 70);
+      if (blnLife1 == true){
+        rect(555, 5, 10, 10);
+      }
+      if (blnLife2 == true){
+        rect(570, 5, 10, 10);
+      }
+      if (blnLife3 == true){
+        rect(585, 5, 10, 10);
+      }
+    
       // Draw Falling Snow 
       stroke(255);
       fill(255);
@@ -52,7 +65,8 @@ public class Sketch extends PApplet {
         intSnowX = width * i / fltSnowY.length;
         ellipse(intSnowX, fltSnowY[i], 25, 25);
         fltSnowY[i] += intSnowfall;
-    
+        playerCollision();
+
         if (fltSnowY[i] > height) {
           fltSnowY[i] = 0;
         }
@@ -61,20 +75,7 @@ public class Sketch extends PApplet {
       // Draw player and movements  
       playerMovement();
       fill(130, 195, 250);
-      ellipse(intPlayerX, intPlayerY, 50, 50);
-
-      // Player Lives 
-      stroke(255,70, 70);
-      fill(255, 70, 70);
-      if (blnLife1 == true){
-        rect(355, 5, 10, 10);
-      }
-      if (blnLife2 == true){
-        rect(370, 5, 10, 10);
-      }
-      if (blnLife3 == true){
-        rect(385, 5, 10, 10);
-      }
+      ellipse(intPlayerX, intPlayerY, 30, 30);
     } else {
       background(255);
     }
@@ -86,11 +87,11 @@ public class Sketch extends PApplet {
   public void playerMovement(){
     if (blnUp == true && intPlayerY >= 25){
       intPlayerY -= 3;
-    } else if (blnDown == true && intPlayerY <= 375){
+    } else if (blnDown == true && intPlayerY <= 575){
       intPlayerY += 3;
     } else if (blnLeft == true && intPlayerX >= 25){
       intPlayerX -= 3;
-    } else if (blnRight == true && intPlayerX <= 375){
+    } else if (blnRight == true && intPlayerX <= 575){
       intPlayerX += 3;
     }
   }
@@ -142,9 +143,22 @@ public class Sketch extends PApplet {
    */
   public void playerCollision(){
     /* check if intPlayerX is between these 2 values of each snow circle, and if intPlayerY is between these 2 values of each snow circle
-       if yes, check which lives are still true, and make the leftmost one false 
-       if all lives are false, make background(255) and stop everything 
+       if yes, check which lives are still true, and make the leftmost one false  
     */
+
+    for (int i = 0; i < fltSnowY.length; i++){
+      if (intPlayerX - 15 < intSnowX + 12 && intPlayerX + 15 > intSnowX - 12){
+        if (intPlayerY - 15 < fltSnowY[i] + 12 && intPlayerY + 15 > fltSnowY[i] - 12){
+          if (blnLife1 == true){
+            blnLife1 = false;
+          } else if (blnLife1 == false){
+            blnLife2 = false;
+          } else if (blnLife2 == false){
+            blnLife3 = false;
+          }
+        }
+      }
+    }
   }
   
   /**
