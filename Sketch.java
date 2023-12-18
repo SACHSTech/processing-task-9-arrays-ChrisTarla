@@ -1,11 +1,3 @@
-/** Instructions 
- * Player loses a life everytime it collides with snowflake  
- * Add mouse control so players can click on snowflakes and make them disappear while using WASD keys with other hand 
- * 
- * TIP: introduce an additional "ballHideStatus" related array to store the state of each snowball; elements will be defaulted to false, and when a 
- * snowball is clicked on, the corresponding ballHideStatus will become true and the snowball will no longer be drawn to the screen 
- */
-
 import processing.core.PApplet;
 
 public class Sketch extends PApplet {
@@ -17,13 +9,13 @@ public class Sketch extends PApplet {
   int intPlayerX = 300;
   int intPlayerY = 575;
   // Snow Variables 
-  int intSnowX;
+  int[] intSnowX = new int[15];
   float[] fltSnowY = new float[15];
   int intSnowfall = 2;
+  boolean[] blnShowSnow = new boolean[15];
   // Player Lives Variables 
-  boolean blnLife1 = true;
-  boolean blnLife2 = true;
-  boolean blnLife3 = true;
+  int intLives = 3;
+  boolean blnPlayerAlive = true;
   
   // Called once at the beginning of execution, put your size all in this method
   public void settings() {
@@ -36,25 +28,28 @@ public class Sketch extends PApplet {
     background(205, 230, 255);
     for (int i = 0; i < fltSnowY.length; i++){
       fltSnowY[i] = random(0, 450);
+      intSnowX[i] = width * i / fltSnowY.length;
+      blnShowSnow[i] = true;
     }
   }
 
   // Called repeatedly, anything drawn to the screen goes here
   public void draw() {
-    if (blnLife3 == true){
+    if (blnPlayerAlive == true){
       // Reset background for animation effect 
       background(205, 230, 255);
       
       // Player Lives 
       stroke(255,70, 70);
       fill(255, 70, 70);
-      if (blnLife1 == true){
+      if (intLives == 3){
         rect(555, 5, 10, 10);
-      }
-      if (blnLife2 == true){
         rect(570, 5, 10, 10);
-      }
-      if (blnLife3 == true){
+        rect(585, 5, 10, 10);
+      } else if (intLives == 2){
+        rect(570, 5, 10, 10);
+        rect(585, 5, 10, 10);
+      } else if (intLives == 1){
         rect(585, 5, 10, 10);
       }
     
@@ -62,13 +57,15 @@ public class Sketch extends PApplet {
       stroke(255);
       fill(255);
       for (int i = 0; i < fltSnowY.length; i++){
-        intSnowX = width * i / fltSnowY.length;
-        ellipse(intSnowX, fltSnowY[i], 25, 25);
-        fltSnowY[i] += intSnowfall;
-        playerCollision();
+        if (blnShowSnow[i] == true){
+          ellipse(intSnowX[i], fltSnowY[i], 25, 25);
+          playerCollision();
+          fltSnowY[i] += intSnowfall;
 
-        if (fltSnowY[i] > height) {
-          fltSnowY[i] = 0;
+          if (fltSnowY[i] > height) {
+            fltSnowY[i] = 0;
+            blnShowSnow[i] = true;
+          }
         }
       }
         
@@ -142,22 +139,20 @@ public class Sketch extends PApplet {
    * A program that detects if the player circle collides with the snow, and deducts a life accordingly 
    */
   public void playerCollision(){
-    /* check if intPlayerX is between these 2 values of each snow circle, and if intPlayerY is between these 2 values of each snow circle
-       if yes, check which lives are still true, and make the leftmost one false  
-    */
-
     for (int i = 0; i < fltSnowY.length; i++){
-      if (intPlayerX - 15 < intSnowX + 12 && intPlayerX + 15 > intSnowX - 12){
-        if (intPlayerY - 15 < fltSnowY[i] + 12 && intPlayerY + 15 > fltSnowY[i] - 12){
-          if (blnLife1 == true){
-            blnLife1 = false;
-          } else if (blnLife1 == false){
-            blnLife2 = false;
-          } else if (blnLife2 == false){
-            blnLife3 = false;
-          }
+      if (intPlayerY - 15 < fltSnowY[i] + 12 && intPlayerY + 15 > fltSnowY[i] - 12){
+        if (intPlayerX - 15 < intSnowX[i] + 12 && intPlayerX + 15 > intSnowX[i] - 12){        
+          blnShowSnow[i] = false;
+          intLives --;
+          updateLives();
         }
       }
+    }
+  }
+
+  public void updateLives(){
+    if (intLives == 0){
+      blnPlayerAlive = false;
     }
   }
   
@@ -165,8 +160,12 @@ public class Sketch extends PApplet {
    * A program that detects if the player clicks on a snow circle, and hides the respective circle 
    */
   public void mouseClicked(){
-    /* check if MouseX is between these 2 values of each snow circle, and if MouseY is between these 2 values of each snow circle 
-       if yes, make that snow circle disappear by making a hide status variable true 
-    */
+    for (int j = 0; j < fltSnowY.length; j++){
+      if (mouseY < fltSnowY[j] + 12 && mouseY > fltSnowY[j] - 12){
+        if (mouseX < intSnowX[j] + 12 && mouseX > intSnowX[j] - 12){
+          blnShowSnow[j] = false;
+        }
+      }
+    }
   }
 }
