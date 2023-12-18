@@ -12,7 +12,6 @@ public class Sketch extends PApplet {
   int[] intSnowX = new int[15];
   float[] fltSnowY = new float[15];
   int intSnowfall = 2;
-  boolean[] blnShowSnow = new boolean[15];
   // Player Lives Variables 
   int intLives = 3;
   boolean blnPlayerAlive = true;
@@ -29,7 +28,6 @@ public class Sketch extends PApplet {
     for (int i = 0; i < fltSnowY.length; i++){
       fltSnowY[i] = random(0, 450);
       intSnowX[i] = width * i / fltSnowY.length;
-      blnShowSnow[i] = true;
     }
   }
 
@@ -39,7 +37,7 @@ public class Sketch extends PApplet {
       // Reset background for animation effect 
       background(205, 230, 255);
       
-      // Player Lives 
+      // Draw Player Lives 
       stroke(255,70, 70);
       fill(255, 70, 70);
       if (intLives == 3){
@@ -57,15 +55,12 @@ public class Sketch extends PApplet {
       stroke(255);
       fill(255);
       for (int i = 0; i < fltSnowY.length; i++){
-        if (blnShowSnow[i] == true){
-          ellipse(intSnowX[i], fltSnowY[i], 25, 25);
-          playerCollision();
-          fltSnowY[i] += intSnowfall;
+        ellipse(intSnowX[i], fltSnowY[i], 25, 25);
+        playerCollision();
+        fltSnowY[i] += intSnowfall;
 
-          if (fltSnowY[i] > height) {
-            fltSnowY[i] = 0;
-            blnShowSnow[i] = true;
-          }
+        if (fltSnowY[i] > height) {
+          fltSnowY[i] = 0;
         }
       }
         
@@ -73,13 +68,15 @@ public class Sketch extends PApplet {
       playerMovement();
       fill(130, 195, 250);
       ellipse(intPlayerX, intPlayerY, 30, 30);
+
+    // End game 
     } else {
       background(255);
     }
   }
 
   /**
-   * A program that changes the x and y value of the provided variables based on the conditions of the user keyboard input 
+   * A method that changes the x and y value of the provided variables based on the conditions of the user keyboard input 
    */
   public void playerMovement(){
     if (blnUp == true && intPlayerY >= 25){
@@ -94,7 +91,7 @@ public class Sketch extends PApplet {
   }
 
   /**
-   * A program that reads the user keyboard input and changes values according to the pressed keys 
+   * A method that reads the user keyboard input and changes values according to the pressed keys 
    */
   public void keyPressed(){
     if (key == 'W' || key == 'w'){
@@ -115,7 +112,7 @@ public class Sketch extends PApplet {
   }
 
   /**
-   * A program that stops the user keyaord input and resets values according to the pressed keys 
+   * A method that stops the user keyaord input and resets values according to the pressed keys 
    */
   public void keyReleased(){
     if (key == 'W' || key == 'w'){
@@ -136,13 +133,13 @@ public class Sketch extends PApplet {
   }
 
   /**
-   * A program that detects if the player circle collides with the snow, and deducts a life accordingly 
+   * A method that detects if the player circle collides with the snow, and deducts a life accordingly 
    */
   public void playerCollision(){
     for (int i = 0; i < fltSnowY.length; i++){
       if (intPlayerY - 15 < fltSnowY[i] + 12 && intPlayerY + 15 > fltSnowY[i] - 12){
         if (intPlayerX - 15 < intSnowX[i] + 12 && intPlayerX + 15 > intSnowX[i] - 12){        
-          blnShowSnow[i] = false;
+          fltSnowY[i] = 0;
           intLives --;
           updateLives();
         }
@@ -150,6 +147,9 @@ public class Sketch extends PApplet {
     }
   }
 
+  /**
+   * A method that checks if the player has more than 0 lives and is still alive 
+   */
   public void updateLives(){
     if (intLives == 0){
       blnPlayerAlive = false;
@@ -157,13 +157,13 @@ public class Sketch extends PApplet {
   }
   
   /**
-   * A program that detects if the player clicks on a snow circle, and hides the respective circle 
+   * A method that detects if the player clicks on a snow circle, and hides the respective circle 
    */
   public void mouseClicked(){
     for (int j = 0; j < fltSnowY.length; j++){
-      if (mouseY < fltSnowY[j] + 12 && mouseY > fltSnowY[j] - 12){
+      if (mouseY < fltSnowY[j] + 20 && mouseY > fltSnowY[j] - 20){
         if (mouseX < intSnowX[j] + 12 && mouseX > intSnowX[j] - 12){
-          blnShowSnow[j] = false;
+          fltSnowY[j] = 0;
         }
       }
     }
